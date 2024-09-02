@@ -3,9 +3,10 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import path from "path";
 
-//Socket 
-import {app, server} from './socket/soket.js'
+//Socket
+import { app, server } from "./socket/soket.js";
 
 // Routes
 import authRoutes from "./routes/auth.routes.js";
@@ -19,6 +20,8 @@ dotenv.config();
 
 // PORT Connection
 const PORT = process.env.PORT || 5000;
+
+const __dirname = path.resolve();
 
 // Middleware to parse incoming JSON requests and make the parsed data available in req.body
 app.use(express.json());
@@ -37,6 +40,12 @@ app.use("/api/messages", messageRoutes);
 
 // Any requests to "/api/users" will be handled by the routes defined in userRoutes.
 app.use("/api/users", userRoutes);
+
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+});
 
 // Testing Port
 /*app.get("/", (req, res) => {
