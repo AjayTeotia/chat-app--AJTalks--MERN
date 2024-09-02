@@ -2,6 +2,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import cors from 'cors'
 
 // Routes
 import authRoutes from "./routes/auth.routes.js";
@@ -22,8 +23,10 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
 // Middleware to parse cookies from the HTTP request and populate req.cookies with an object keyed by the cookie names
-
 app.use(cookieParser());
+
+// Enable Cross-Origin Resource Sharing (CORS) for all routes
+app.use(cors());
 
 // Mount the authRoutes middleware at the /api/auth path
 app.use("/api/auth", authRoutes);

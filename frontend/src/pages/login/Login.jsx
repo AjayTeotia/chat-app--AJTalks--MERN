@@ -1,6 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import useLogin from "../../hooks/useLogin";
 
 const Login = () => {
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+
+  const { loading, login } = useLogin();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await login(userName, password);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-w-96 mx-auto">
       {/*Glass effect*/}
@@ -12,7 +24,7 @@ const Login = () => {
         </h1>
 
         {/*Form*/}
-        <form>
+        <form onSubmit={handleSubmit}>
           {/*Username*/}
           <div>
             <label className="label p-2">
@@ -23,6 +35,8 @@ const Login = () => {
               type="text"
               placeholder="Enter username"
               className="w-full h-10 input input-bordered"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
             />
           </div>
 
@@ -36,20 +50,31 @@ const Login = () => {
               type="password"
               placeholder="Enter password"
               className="w-full h-10 input input-bordered"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
           {/*don't have an account*/}
-          <a
-            href="#"
+          <Link
+            to="/signup"
             className="text-sm hover:text-blue-600  hover:underline mt-2 inline-block"
           >
             {"Don't"} have an acount?
-          </a>
+          </Link>
 
           {/*Login button*/}
           <div>
-            <button className="btn btn-block btn-sm mt-2">Login</button>
+            <button
+              className="btn btn-block btn-sm mt-2 border border-slate-700"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="loading loading-spinner "></span>
+              ) : (
+                "Login"
+              )}
+            </button>
           </div>
         </form>
       </div>
