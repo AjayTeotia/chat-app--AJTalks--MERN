@@ -2,19 +2,20 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import cors from 'cors'
+import cors from "cors";
+
+//Socket 
+import {app, server} from './socket/soket.js'
 
 // Routes
 import authRoutes from "./routes/auth.routes.js";
 import messageRoutes from "./routes/message.routers.js";
-import userRoutes from './routes/user.routers.js';
+import userRoutes from "./routes/user.routers.js";
 
 // Connection to MongoDB
 import connectToMongoDB from "./db/connectToMongoDB.js";
 
 dotenv.config();
-
-const app = express();
 
 // PORT Connection
 const PORT = process.env.PORT || 5000;
@@ -42,7 +43,7 @@ app.use("/api/users", userRoutes);
     res.send("Hello, world!");
 }); */
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   connectToMongoDB();
   console.log(`SERVER IS LISTENING TO PORT: ${PORT}`);
 });

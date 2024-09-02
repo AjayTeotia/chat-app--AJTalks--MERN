@@ -1,6 +1,7 @@
 import httpStatus from "http-status";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import { getReceiverSocketId, io } from "../socket/soket.js";
 
 export const sendMessage = async (req, res) => {
   //console.log("MESSAGE SENT", req.params.id);
@@ -47,6 +48,13 @@ export const sendMessage = async (req, res) => {
     // this will run in parallel
     await Promise.all([conversation.save(), newMessage.save()]);
 
+    //socket id
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      // io.to(<socket_id>).emit() used to send events to specific client
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
+
     //console.log("MESSAGE SENT SUCCESSFULLY");
   } catch (error) {
     console.log(`ERROR IN SEND MESSAGE CONTROLLER: ${error.message}`);
@@ -55,21 +63,21 @@ export const sendMessage = async (req, res) => {
 };
 
 export const getMessages = async (req, res) => {
-	try {
-		const { id: userToChatId } = req.params;
-		const senderId = req.user?._id;
+  try {
+    const { id: userToChatId } = req.params;
+    const senderId = req.user?._id;
 
-		const conversation = await Conversation.findOne({
-			participants: { $all: [senderId, userToChatId] },
-		}).populate("message"); // NOT REFERENCE BUT ACTUAL MESSAGES
+    const conversation = await Conversation.findOne({
+      participants: { $all: [senderId, userToChatId] },
+    }).populate("message"); // NOT REFERENCE BUT ACTUAL MESSAGES
 
-		if (!conversation) return res.status(200).json([]);
+    if (!conversation) return res.status(200).json([]);
 
-		const messages = conversation.message;
+    const messages = conversation.message;
 
-		res.status(200).json(messages);
-	} catch (error) {
-		console.log("Error in getMessages controller: ", error.message);
-		res.status(500).json({ error: "Internal server error" });
-	}
+    res.status(200).json(messages);
+  } catch (error) {
+    console.log("Error in getMessages controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
